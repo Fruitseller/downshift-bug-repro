@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>
+    Bug Repro
   </title>
   <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
@@ -25,34 +26,14 @@
     'Crime and Punishment',
   ]
 
-  function useEventCallback(fn) {
-    const ref = React.useRef(fn);
-
-    // we copy a ref to the callback scoped to the current state/props on each render
-    React.useLayoutEffect(() => {
-      ref.current = fn;
-    });
-
-    return React.useCallback(
-        (...args) => ref.current.apply(void 0, args),
-        []
-    );
-  }
-
   function Select() {
 
     const [value, setValue] = React.useState("");
-    const [open, setOpen] = React.useState(false);
-    const [force, setForce] = React.useState(0);
 
-    const onSelectedItemChange = useEventCallback((changes) => {
-
-      console.warn("ON")
-      if (changes.selectedItem !== undefined && changes.selectedItem !== null) {
+    const onSelectedItemChange = (changes) => {
+      console.warn("onSelectedItemChange triggered")
         setValue(changes.selectedItem);
-        setForce(force+1);
-      }
-    });
+    };
 
     const {
       isOpen,
@@ -61,16 +42,8 @@
       getMenuProps,
       getItemProps,
     } = Downshift.useSelect({
-      isOpen: open,
-      onIsOpenChange: (changed) => {
-        if (changed.isOpen) {
-          setOpen(true);
-        } else if (!changed.isOpen) {
-          setOpen(false);
-        }
-      },
-      items: [...books],
-      onSelectedItemChange: (changed) => onSelectedItemChange(changed),
+      items: books,
+      onSelectedItemChange,
       selectedItem: value
     })
 
